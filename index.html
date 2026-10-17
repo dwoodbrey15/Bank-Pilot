@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09251f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Offline, opponent-aware BANK dice strategy and scorekeeper.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<title>Bank Pilot</title>
+<style>
+:root{color-scheme:dark;--bg:#061a16;--panel:#102e26;--line:#28473c;--ink:#f6f4e8;--muted:#a1b9ad;--green:#c8f38b;--gold:#eac48a;--red:#ffac9f;font-family:ui-rounded,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink)}body{font-size:14px}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation;border:1px solid var(--line);border-radius:12px;background:#173a30;color:var(--ink);min-height:43px;padding:9px 13px;font-weight:650}button:disabled{opacity:.35;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:2px}.primary{background:var(--green);color:#14291c;border-color:var(--green)}.gold{background:var(--gold);color:#302618;border-color:var(--gold)}.quiet{background:transparent}.danger{color:var(--red)}input,select{width:100%;min-width:0;min-height:42px;border:1px solid var(--line);border-radius:10px;background:#071f19;color:var(--ink);padding:8px 10px}input{font-size:16px}label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}h1,h2,h3,p{margin:0}h2{font-size:24px;letter-spacing:-.6px}small,.muted{color:var(--muted)}.app{height:100vh;height:100dvh;max-width:650px;margin:auto;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 10px) 17px calc(env(safe-area-inset-bottom) + 8px);gap:10px}.header{display:flex;align-items:center;justify-content:space-between;flex:none}.brand{font-size:20px;font-weight:800;letter-spacing:-.8px}.brand span{color:var(--green)}.eyebrow{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);font-weight:700}.chip{border:1px solid var(--line);border-radius:20px;padding:6px 10px;font-size:11px;color:var(--muted)}.screen{display:none;flex:1;min-height:0}.screen.on{display:flex;flex-direction:column;gap:10px}.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;flex:none}.nav button{font-size:12px;min-height:43px;background:transparent;border-color:transparent;color:var(--muted)}.nav button.on{background:#183b2e;color:var(--green);border-color:var(--line)}.row{display:flex;align-items:center;gap:9px}.between{justify-content:space-between}.grow{flex:1;min-width:0}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px}.potcard{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;background:linear-gradient(120deg,#214736,#12362b)}.pot{font-size:46px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05;letter-spacing:-2px}.round-label{text-align:right;font-size:12px;color:var(--muted);line-height:1.8}.advice{flex:1;min-height:152px;display:flex;flex-direction:column;justify-content:center;gap:9px;position:relative;background:radial-gradient(ellipse at top right,#244532,transparent 75%),var(--panel)}.recommend{font-size:37px;font-weight:850;letter-spacing:-1px;line-height:1.05;color:var(--green)}.recommend.bank{color:var(--gold)}.reason{font-size:13px;line-height:1.45;color:#c3d1c7;max-width:95%}.odds{display:grid;grid-template-columns:1fr 1fr;gap:9px}.odd{background:#081f19;border-radius:11px;padding:10px 12px}.odd strong{font-size:23px;display:block;letter-spacing:-.6px}.odd span{color:var(--muted);font-size:11px}.footnote{font-size:10px;color:var(--muted);line-height:1.4}.dice-entry{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:8px;align-items:end}.dice-entry label{font-size:10px;letter-spacing:1px;text-transform:uppercase}.dice-entry select{font-size:19px;font-weight:750;text-align:center}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.actions button{min-height:48px}.event{min-height:30px;display:flex;align-items:center;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.smallbtn{font-size:12px;min-height:36px;padding:7px 10px}.players{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0}.player{display:flex;gap:9px;align-items:center;min-height:69px;padding:11px 12px;background:var(--panel);border:1px solid var(--line);border-radius:13px}.avatar{width:31px;height:31px;display:grid;place-items:center;border-radius:50%;background:#2e4e3c;font-size:12px;font-weight:800;color:var(--green);flex:none}.name{font-size:14px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:180px}.score{font-size:19px;font-weight:750;font-variant-numeric:tabular-nums}.status{font-size:10px;color:var(--muted);margin-top:3px}.pager{display:flex;justify-content:space-between;align-items:center;flex:none;gap:10px}.pager span{font-size:12px;color:var(--muted)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.setupintro{line-height:1.5;font-size:13px;color:var(--muted)}.setupblocks{display:flex;flex-direction:column;gap:13px;flex:1;justify-content:center;min-height:0}.methodcontent{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}.methodcontent p{color:#c3d1c7;font-size:14px;line-height:1.65}.methodcontent h3{font-size:22px;letter-spacing:-.4px}.callout{border-left:3px solid var(--green);padding-left:13px;color:var(--green)!important}.modalback{position:fixed;inset:0;z-index:10;display:none;align-items:center;justify-content:center;background:#00120cdd;padding:calc(env(safe-area-inset-top) + 12px) 18px calc(env(safe-area-inset-bottom) + 12px)}.modalback.open{display:flex}.modal{background:#123127;border:1px solid #42634c;padding:20px;border-radius:20px;width:min(100%,430px);max-height:100%;display:flex;flex-direction:column;gap:13px}.modal h3{font-size:22px}.modal p{font-size:13px;color:var(--muted);line-height:1.5}.modal .formgrid{gap:10px}.hidden{display:none!important}.spinner{height:3px;background:#1f4436;border-radius:5px;overflow:hidden}.spinner div{height:100%;width:35%;background:var(--green);animation:slide 1.2s infinite ease-in-out}@keyframes slide{from{transform:translateX(-110%)}to{transform:translateX(400%)}}.noscript{position:absolute;inset:25%;background:#193a2b;padding:25px}.tiny{font-size:11px}.entrynote{font-size:10px;color:var(--muted)}
+@media(max-height:760px){.app{gap:7px;padding-top:calc(env(safe-area-inset-top) + 5px)}.screen.on{gap:7px}.pot{font-size:39px}.potcard{padding:10px 15px}.card{padding:12px}.advice{min-height:133px;gap:6px}.recommend{font-size:31px}.odd{padding:7px 10px}.odd strong{font-size:21px}.reason{font-size:12px}.player{min-height:60px;padding:8px 10px}.methodcontent{gap:12px}.methodcontent p{font-size:13px;line-height:1.5}.setupblocks{gap:10px}.setupintro{font-size:12px}.event{min-height:23px}.header .chip{font-size:10px}.name{max-width:145px}}
+@media(max-height:760px){.entrynote{display:none}.round-label{line-height:1.5}.advice{gap:5px}.event{min-height:25px;font-size:11px}#undo{min-height:28px;padding:4px 8px}.footnote{font-size:9.5px}}
+@media(max-height:700px){.header .eyebrow{display:none}.brand{font-size:18px}.chip{padding:4px 8px}.card{padding:10px}.recommend{font-size:28px}.reason{font-size:11.5px}.odd{padding:6px 9px}.odd strong{font-size:20px}.nav button{min-height:39px}.actions button{min-height:43px}.dice-entry label{margin-bottom:4px}.dice-entry select{min-height:39px}}
+@media(max-height:590px){.app{padding-top:4px;padding-bottom:4px;gap:4px}.header{display:none}.screen.on{gap:5px}.potcard{padding:7px 13px}.pot{font-size:30px}.round-label{line-height:1.5}.advice{min-height:120px;padding:9px}.recommend{font-size:27px}.odds{gap:5px}.odd{padding:5px 9px}.odd strong{font-size:18px}.reason{font-size:11px}.footnote{font-size:9px}.event{display:none}.actions button{min-height:39px}.dice-entry select{min-height:36px}.nav button{min-height:34px;padding:5px}.player{min-height:49px;padding:5px 9px}.setupblocks{gap:6px}.setupintro{font-size:11px}.methodcontent p{font-size:12px;line-height:1.4}.methodcontent{gap:10px}.modal{padding:12px;gap:9px}.modal p{font-size:11px}.modal h3{font-size:18px}}
+@media(orientation:landscape) and (max-height:550px){.app{max-width:1100px;flex-direction:row;padding:8px calc(env(safe-area-inset-right) + 12px) 8px calc(env(safe-area-inset-left) + 12px)}.screen{width:100%}.nav{display:flex;flex-direction:column;width:75px;justify-content:center}.screen.on#play{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr auto}.potcard{grid-column:1}.advice{grid-column:2;grid-row:1/4}.dice-entry{grid-column:1}.actions{grid-column:1}.entrynote{display:none}.players{display:grid;grid-template-columns:1fr 1fr}.setupblocks{display:grid;grid-template-columns:1fr 1fr;align-items:center}.methodcontent{gap:9px}.methodcontent p{font-size:13px}}
+</style>
+</head>
+<body>
+<noscript><div class="noscript">Enable JavaScript to use Bank Pilot.</div></noscript>
+<main class="app">
+<header class="header"><div><div class="eyebrow">Your next move</div><div class="brand">BANK<span> PILOT</span></div></div><div class="chip" id="offline">Offline capable</div></header>
+<section id="play" class="screen on">
+<div class="card potcard"><div><div class="eyebrow">Shared pot</div><div class="pot" id="pot">0</div></div><div class="round-label"><div id="roundlabel">Round 1 / 20</div><div id="rolllabel">0 rolls · safe phase</div><div id="activecount">2 players still in</div></div></div>
+<div class="card advice"><div class="row between"><span class="eyebrow" id="advisorylabel">Strategy assistant</span><button id="deeper" class="smallbtn quiet hidden">Think deeper</button></div><div class="recommend" id="recommend">READY TO PLAY</div><p class="reason" id="reason">Set up your table, then enter the dice after each roll.</p><div class="spinner hidden" id="thinking"><div></div></div><div class="odds hidden" id="odds"><div class="odd"><span>BANK NOW</span><strong id="bankodds">—</strong><span id="bankmargin">Estimated win share</span></div><div class="odd"><span>ROLL AGAIN</span><strong id="rollodds">—</strong><span id="rollmargin">Estimated win share</span></div></div><div class="footnote" id="confidence">Human strategies are unknown. Model estimates are not perfect play.</div></div>
+<div class="dice-entry"><div><label for="die1">Die one</label><select id="die1" aria-label="First die"></select></div><div><label for="die2">Die two</label><select id="die2" aria-label="Second die"></select></div><button class="primary" id="record">Record roll</button></div>
+<div class="entrynote">Enter both dice. Doubles are detected automatically.</div>
+<div class="actions"><button class="gold" id="bankme">BANK my points</button><button id="bankother">Opponent BANK</button></div>
+<div class="row between"><div class="event grow" id="event">Physical dice. Real players. Better decisions.</div><button class="smallbtn quiet" id="undo" disabled>Undo</button></div>
+<button class="primary hidden" id="nextround">Next round</button>
+</section>
+<section class="screen" id="table"><div class="row between"><div><div class="eyebrow">Live scoreboard</div><h2>Your table</h2></div><button class="smallbtn" id="addplayer">+ Player</button></div><p class="setupintro">Tap BANK to record a player’s decision. Tap their name to edit their score or style.</p><div class="players" id="playerlist"></div><div class="pager"><button class="smallbtn" id="prevplayers">← Previous</button><span id="playerpage"></span><button class="smallbtn" id="nextplayers">Next →</button></div></section>
+<section class="screen" id="setup"><div><div class="eyebrow">Start / adjust</div><h2>Game settings</h2></div><div class="setupblocks"><div class="card"><div class="formgrid"><div><label for="rounds">Total rounds</label><select id="rounds"><option>10</option><option>15</option><option selected>20</option></select></div><div><label for="quality">Analysis effort</label><select id="quality"><option value="normal">Standard</option><option value="deep">Deep · 3× samples</option></select></div></div><p class="footnote" style="margin-top:10px">Changes apply immediately. A round count below the current round is not allowed.</p></div><div class="card"><div class="row between"><div><strong>Join a game in progress</strong><p class="footnote">Set the current round, pot and roll count.</p></div><button class="smallbtn" id="position">Set state</button></div></div><div><p class="setupintro" id="savestatus">Progress is saved on this device after every action.</p><div class="row" style="margin-top:10px"><button class="grow" id="exportgame">Export game</button><button class="grow" id="importgame">Import game</button></div></div><div class="row"><button class="grow danger" id="newgame">New game</button><button class="grow quiet" id="install">Offline setup</button></div></div></section>
+<section class="screen" id="method"><div><div class="eyebrow">Know your edge</div><h2>How to use it</h2></div><div class="methodcontent" id="methodcontent"></div><div class="pager"><button class="smallbtn" id="prevmethod">← Previous</button><span id="methodpage"></span><button class="smallbtn" id="nextmethod">Next →</button></div></section>
+<nav class="nav" aria-label="Main navigation"><button data-screen="play" class="on">Play</button><button data-screen="table">Players</button><button data-screen="setup">Settings</button><button data-screen="method">Guide</button></nav>
+</main>
+<div class="modalback" id="modalback" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modal" id="modal"></div></div>
+<input type="file" id="importfile" accept="application/json,.json" hidden>
+<script id="engine-source" type="text/plain">function bankEngine() {
+  const bases = [20,35,55,80,115,165,240,360,550,900,1600];
+  const ordinary = [];
+  for(let a=1;a<=6;a++) for(let b=1;b<=6;b++) if(a!==b && a+b!==7) ordinary.push(a+b);
+  const clamp=(v,l,h)=>Math.max(l,Math.min(h,v));
+  function random(seed) {
+    let t=seed>>>0;
+    return ()=>{t+=0x6D2B79F5;let x=t;x=Math.imul(x^x>>>15,x|1);x^=x+Math.imul(x^x>>>7,x|61);return ((x^x>>>14)>>>0)/4294967296;};
+  }
+  function hash(seed,r,k,p) {
+    let x=(seed^Math.imul(r+1,0x9e3779b1)^Math.imul(k+1,0x85ebca6b)^Math.imul(p+9,0xc2b2ae35))>>>0;
+    x=Math.imul(x^x>>>16,0x7feb352d);x=Math.imul(x^x>>>15,0x846ca68b);return ((x^x>>>16)>>>0)/4294967296;
+  }
+  function weights(p) {
+    const mean=p.style==='cautious'?60:p.style==='bold'?300:130;
+    const a=bases.map((x,i)=>-Math.pow(Math.log(x/mean),2)/1.5+(p.style==='learn'?(p.evidence?.[i]||0):0));
+    const m=Math.max(...a), w=a.map(v=>Math.exp(v-m)), z=w.reduce((a,b)=>a+b,0);
+    return w.map(v=>v/z);
+  }
+  function adjusted(base,scores,i,remaining) {
+    let lead=-Infinity;
+    for(let j=0;j<scores.length;j++) if(j!==i) lead=Math.max(lead,scores[j]);
+    const gap=lead-scores[i];
+    return base*clamp(1+gap/(220*Math.sqrt(remaining)),.55,3.5);
+  }
+  function hazard(pot,scores,i,remaining,base,final=false) {
+    let lead=-Infinity;
+    for(let j=0;j<scores.length;j++) if(j!==i) lead=Math.max(lead,scores[j]);
+    if(final && scores[i]+pot<lead) return .015;
+    const t=adjusted(base,scores,i,remaining);
+    return .025+.95/(1+Math.exp(-Math.log(Math.max(1,pot)/t)/.48));
+  }
+  function observe(p,pot,scores,i,remaining,banked) {
+    if(p.style!=='learn') return;
+    if(!p.evidence) p.evidence=bases.map(()=>0);
+    bases.forEach((b,j)=>{const h=hazard(pot,scores,i,remaining,b,remaining===1);p.evidence[j]+=Math.log(banked?h:1-h);});
+    const m=Math.max(...p.evidence);p.evidence=p.evidence.map(v=>v-m);
+    p.observations=(p.observations||0)+1;
+  }
+  function reward(scores) {
+    const m=Math.max(...scores);
+    return scores[0]===m?1/scores.filter(v=>v===m).length:0;
+  }
+  function transition(pot,rolls,a,b) {
+    if(rolls<3) return {pot:pot+(a+b===7?70:a+b),bust:false};
+    if(a+b===7) return {pot:0,bust:true};
+    return {pot:a===b?pot*2:pot+a+b,bust:false};
+  }
+  function exactEnd(s) {
+    if(s.round!==s.rounds || !s.players[0].active || s.players.slice(1).some(p=>p.active)) return null;
+    const scores=s.players.map(p=>p.score), other=Math.max(...scores.slice(1));
+    const tied=scores.slice(1).filter(v=>v===other).length;
+    const bank=scores[0]+s.pot>other?1:scores[0]+s.pot===other?1/(tied+1):0;
+    const bust=scores[0]>other?1:scores[0]===other?1/(tied+1):0;
+    const action=bank===1?'BANK':'ROLL';
+    const target=Math.max(0,other-scores[0]+1);
+    if(target>250000) return {action,bank,roll:null,exact:true,target};
+    const v=new Float64Array(target+1);
+    function at(x) { return x>=target?1:v[x]; }
+    for(let b=target-1;b>=s.pot;b--) {
+      let total=6*bust;
+      if(b!==0) total+=6*at(2*b);
+      for(const x of ordinary) total+=at(b+x);
+      const continuing=total/(b===0?30:36);
+      const stopping=scores[0]+b===other?1/(tied+1):0;
+      v[b]=Math.max(stopping,continuing);
+    }
+    let roll=6*bust+6*at(s.pot*2);
+    for(const x of ordinary) roll+=at(s.pot+x);
+    roll/=36;
+    return {action,bank,roll,exact:true,target};
+  }
+  function simulate(s,policy,forceBank,seed,posteriors) {
+    const rng=random(seed), n=s.players.length;
+    const scores=s.players.map(p=>p.score), styles=posteriors.map(w=>{let t=rng();for(let i=0;i<w.length;i++){t-=w[i];if(t<=0)return bases[i];}return bases.at(-1);});
+    let guarded=false;
+    for(let round=s.round;round<=s.rounds;round++) {
+      const current=round===s.round, rem=s.rounds-round+1, final=rem===1;
+      const active=current?s.players.map(p=>p.active):Array(n).fill(true);
+      let pot=current?s.pot:0, rolls=current?s.rolls:0, step=0;
+      if(current && forceBank && active[0]) {scores[0]+=pot;active[0]=false;}
+      while(active.some(Boolean)) {
+        if(rolls>=3) {
+          for(let i=0;i<n;i++) if(active[i]) {
+            let bank=false;
+            if(i===0) {
+              if(current && step===0 && !forceBank) continue;
+              let other=-Infinity, opponents=0;
+              for(let j=1;j<n;j++){other=Math.max(other,scores[j]);if(active[j])opponents++;}
+              if(final && opponents===0) bank=scores[0]+pot>other;
+              else {
+                let t=current?policy.threshold:adjusted(policy.future,scores,0,rem);
+                if(current && policy.adaptive) t=adjusted(policy.threshold,scores,0,rem);
+                bank=pot>=t;
+                if(final && scores[0]+pot<=other) bank=false;
+              }
+            } else bank=hash(seed,round,step,i)<hazard(pot,scores,i,rem,styles[i],final);
+            if(bank) {scores[i]+=pot;active[i]=false;}
+          }
+          if(!active.some(Boolean)) break;
+        }
+        const a=1+Math.floor(rng()*6), b=1+Math.floor(rng()*6);
+        const t=transition(pot,rolls,a,b);pot=t.pot;rolls++;step++;
+        if(t.bust) break;
+        if(step>=160) {guarded=true;for(let i=0;i<n;i++)if(active[i])scores[i]+=pot;break;}
+      }
+    }
+    return {value:reward(scores),guarded};
+  }
+  function analyze(s,quality='normal',progress=()=>{}) {
+    const exact=exactEnd(s);
+    if(exact && exact.roll!==null) return {...exact,samples:0};
+    const post=s.players.map(weights), workload=s.players.length*Math.max(1,s.rounds-s.round+1);
+    const factor=quality==='deep'?3:1;
+    const training=Math.round(clamp(6500/workload,100,500)*factor);
+    const samples=Math.round(clamp(65000/workload,1200,5000)*factor);
+    const thresholds=[s.pot+1,40,70,110,170,260,420,800,1600];
+    const gap=Math.max(...s.players.slice(1).map(p=>p.score))-s.players[0].score;
+    thresholds.push(Math.max(s.pot+1,gap+1));
+    const plans=[];
+    for(const t of [...new Set(thresholds.map(t=>Math.max(s.pot+1,t)))]) for(const future of [70,150,330]) plans.push({threshold:t,future,adaptive:false});
+    for(const future of [70,150,330]) plans.push({threshold:future,future,adaptive:true});
+    let bestRoll=-1,bestBank=-1,rPlan=plans[0],bPlan=plans[0];
+    for(let p=0;p<plans.length;p++) {
+      let a=0,b=0;
+      for(let t=0;t<training;t++) {a+=simulate(s,plans[p],false,(t+1)*7919,post).value;b+=simulate(s,plans[p],true,(t+1)*7919,post).value;}
+      if(a>bestRoll){bestRoll=a;rPlan=plans[p];}if(b>bestBank){bestBank=b;bPlan=plans[p];}
+      if(p%5===0)progress({phase:'Searching stopping plans',done:p,total:plans.length});
+    }
+    let a=0,b=0,d=0,d2=0,a2=0,b2=0,guarded=0;
+    for(let t=0;t<samples;t++) {
+      const seed=(t+1)*104729+0x5a17;
+      const ar=simulate(s,rPlan,false,seed,post),br=simulate(s,bPlan,true,seed,post);
+      const av=ar.value,bv=br.value,delta=av-bv;
+      a+=av;b+=bv;a2+=av*av;b2+=bv*bv;d+=delta;d2+=delta*delta;guarded+=ar.guarded+br.guarded;
+      if(t%500===0)progress({phase:'Checking win chances',done:t,total:samples});
+    }
+    const roll=a/samples,bank=b/samples;
+    const se=Math.sqrt(Math.max(0,d2/samples-Math.pow(d/samples,2))/samples);
+    const ase=Math.sqrt(Math.max(0,a2/samples-roll*roll)/samples),bse=Math.sqrt(Math.max(0,b2/samples-bank*bank)/samples);
+    return {action:exact?.action||(roll>bank?'ROLL':'BANK'),bank,roll,exact:!!exact,samples,se,rollMargin:1.96*ase,bankMargin:1.96*bse,close:Math.abs(roll-bank)<1.96*se,plans:plans.length,rPlan,bPlan,guarded};
+  }
+  return {bases,weights,observe,hazard,transition,exactEnd,analyze,reward,simulate};
+}
+if(typeof module!=='undefined')module.exports=bankEngine;
+</script>
+<script>
+const engineText=document.getElementById('engine-source').textContent;
+const engine=new Function(engineText+';return bankEngine();')();
+const $=id=>document.getElementById(id), fmt=n=>n.toLocaleString('en-US'), pct=v=>(100*v).toFixed(1)+'%';
+const freshPlayer=(name)=>({name,score:0,active:true,banked:0,style:'learn',evidence:engine.bases.map(()=>0),observations:0});
+const fresh=()=>({version:1,round:1,rounds:20,rolls:0,pot:0,ended:false,finished:false,quality:'normal',players:[freshPlayer('You'),freshPlayer('Player 2')],event:'Enter the first roll to begin.'});
+let state=fresh(), history=[],page=0,methodpage=0,worker=null,generation=0,result=null,saveFailed=false,pendingTimer=0;
+function valid(s){return s&&s.version===1&&Array.isArray(s.players)&&s.players.length>=2&&s.players.length<100000&&[10,15,20].includes(s.rounds)&&Number.isInteger(s.round)&&s.round>=1&&s.round<=s.rounds&&Number.isInteger(s.rolls)&&s.rolls>=0&&s.rolls<=10000&&Number.isSafeInteger(s.pot)&&s.pot>=0&&typeof s.ended==='boolean'&&typeof s.finished==='boolean'&&(!s.finished||s.ended)&&(['normal','deep'].includes(s.quality))&&s.players.every(p=>p&&typeof p.name==='string'&&p.name.length<=40&&Number.isSafeInteger(p.score)&&p.score>=0&&typeof p.active==='boolean'&&Number.isSafeInteger(p.banked)&&p.banked>=0&&['learn','cautious','balanced','bold'].includes(p.style)&&Array.isArray(p.evidence)&&p.evidence.length===engine.bases.length&&p.evidence.every(Number.isFinite))&&(s.ended||s.players.some(p=>p.active))&&(s.rolls>=3||s.players.every(p=>p.active));}
+try{const saved=JSON.parse(localStorage.getItem('bank-pilot-v1'));if(valid(saved))state=saved;}catch(e){}
+function save(){try{localStorage.setItem('bank-pilot-v1',JSON.stringify(state));saveFailed=false;}catch(e){saveFailed=true;}$('savestatus').textContent=saveFailed?'Device storage is unavailable. Export your game to keep a backup.':'Progress is saved on this device after every action.';}
+function mutate(fn){history.push(JSON.stringify(state));if(history.length>150)history.shift();fn();save();render();}
+function stopWork(){generation++;clearTimeout(pendingTimer);if(worker){worker.terminate();worker=null;}}
+function showScreen(id){document.querySelectorAll('.screen').forEach(el=>el.classList.toggle('on',el.id===id));document.querySelectorAll('[data-screen]').forEach(el=>el.classList.toggle('on',el.dataset.screen===id));if(id==='table')renderPlayers();}
+document.querySelectorAll('[data-screen]').forEach(el=>el.onclick=()=>showScreen(el.dataset.screen));
+for(const id of ['die1','die2'])for(let n=1;n<=6;n++){const o=document.createElement('option');o.value=n;o.textContent='⚀⚁⚂⚃⚄⚅'[n-1]+'  '+n;$(id).append(o);}
+function modal(title,body,actions){const m=$('modal');m.replaceChildren();const h=document.createElement('h3');h.id='modaltitle';h.textContent=title;m.append(h);if(typeof body==='string'){const p=document.createElement('p');p.textContent=body;m.append(p);}else m.append(body);const buttons=document.createElement('div');buttons.className='row';for(const a of actions){const b=document.createElement('button');b.className='grow '+(a.className||'');b.textContent=a.text;b.onclick=a.fn;buttons.append(b);}m.append(buttons);$('modalback').classList.add('open');setTimeout(()=>m.querySelector('input,select,button')?.focus(),50);}
+function closeModal(){$('modalback').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+function field(label,id,value,type='text'){const d=document.createElement('div');const l=document.createElement('label');l.htmlFor=id;l.textContent=label;const input=document.createElement('input');input.id=id;input.type=type;input.value=value;if(type==='number'){input.min=0;input.step=1;input.inputMode='numeric';}d.append(l,input);return d;}
+function message(t,b){modal(t,b,[{text:'Got it',className:'primary',fn:closeModal}]);}
+function endRound(text){state.ended=true;state.finished=state.round===state.rounds;state.event=text;}
+function bankPlayer(i){if(state.ended||state.rolls<3||!state.players[i].active)return;if(!Number.isSafeInteger(state.players[i].score+state.pot))return message('Score too large','This score exceeds exact whole-number arithmetic in this browser. Correct the game state before continuing.');mutate(()=>{const p=state.players[i];if(i>0)engine.observe(p,state.pot,state.players.map(x=>x.score),i,state.rounds-state.round+1,true);p.score+=state.pot;p.banked=state.pot;p.active=false;state.event=p.name+' banked '+fmt(state.pot)+'.';if(state.players.every(p=>!p.active))endRound('Everyone banked. Round complete.');});}
+$('record').onclick=()=>{if(state.ended)return;const preview=engine.transition(state.pot,state.rolls,+$('die1').value,+$('die2').value);if(!Number.isSafeInteger(preview.pot))return message('Pot too large','This pot exceeds exact whole-number arithmetic in this browser. Correct the game state before continuing.');mutate(()=>{const a=+$('die1').value,b=+$('die2').value;if(state.rolls>=3)for(let i=1;i<state.players.length;i++)if(state.players[i].active)engine.observe(state.players[i],state.pot,state.players.map(x=>x.score),i,state.rounds-state.round+1,false);const t=engine.transition(state.pot,state.rolls,a,b);const safe=state.rolls<3;state.rolls++;state.pot=t.pot;state.event=a+' + '+b+(t.bust?' = 7 · BUST':safe&&a+b===7?' = 7 · +70':!safe&&a===b?' · DOUBLE POT':' · +'+(a+b));if(t.bust)endRound('Seven! Unbanked players get zero this round.');});};
+$('bankme').onclick=()=>bankPlayer(0);
+$('bankother').onclick=()=>{page=0;showScreen('table');};
+$('nextround').onclick=()=>{if(state.finished)return;mutate(()=>{state.round++;state.rolls=0;state.pot=0;state.ended=false;state.players.forEach(p=>{p.active=true;p.banked=0;});state.event='New round. The first three rolls are safe.';});};
+$('undo').onclick=()=>{if(!history.length)return;state=JSON.parse(history.pop());save();render();};
+function render(){
+ stopWork();result=null;$('pot').textContent=fmt(state.pot);$('roundlabel').textContent='Round '+state.round+' / '+state.rounds;$('rolllabel').textContent=state.rolls+' rolls · '+(state.rolls<3?'safe phase':'risk phase');$('activecount').textContent=state.players.filter(p=>p.active).length+' / '+state.players.length+' still in';$('event').textContent=state.event||'';$('undo').disabled=!history.length;$('record').disabled=state.ended;$('bankme').disabled=state.ended||state.rolls<3||!state.players[0].active;$('bankother').disabled=state.ended||state.rolls<3;$('nextround').classList.toggle('hidden',!state.ended||state.finished);$('rounds').value=state.rounds;$('quality').value=state.quality;$('odds').classList.add('hidden');$('deeper').classList.add('hidden');$('thinking').classList.add('hidden');$('recommend').classList.remove('bank');$('advisorylabel').textContent='Strategy assistant';$('confidence').textContent='Model estimates. Unknown humans can play differently.';
+ if(state.finished){const best=Math.max(...state.players.map(p=>p.score)),w=state.players.filter(p=>p.score===best);$('recommend').textContent=w.includes(state.players[0])?(w.length===1?'YOU WIN':'TIED FIRST'):'GAME COMPLETE';$('reason').textContent=w.length===1?w[0].name+' wins with '+fmt(best)+' points.':w.length+' players tie at '+fmt(best)+'.';}
+ else if(state.ended){$('recommend').textContent='ROUND COMPLETE';$('reason').textContent=state.event;}
+ else if(!state.players[0].active){$('recommend').textContent='YOU BANKED';$('reason').textContent=fmt(state.players[0].banked)+' points secured. Keep entering rolls and other players’ BANK decisions.';}
+ else if(state.rolls<3){$('recommend').textContent='SAFE ROLL';$('reason').textContent=(3-state.rolls)+' safe roll'+(3-state.rolls===1?'':'s')+' remaining. A seven adds 70; doubles add their face value. Banking opens after roll three.';$('confidence').textContent='No banking decision is available during the first three rolls.';}
+ else { $('recommend').textContent='ANALYZING…';$('reason').textContent='Comparing BANK and ROLL across the remaining game.';$('thinking').classList.remove('hidden');const token=generation;pendingTimer=setTimeout(()=>analyze(state.quality,token),120); }
+ renderPlayers();
+}
+function analyze(quality,token=generation){
+ if(worker)worker.terminate();
+ const code=engineText+'\nconst E=bankEngine();onmessage=e=>{try{const r=E.analyze(e.data.state,e.data.quality,p=>postMessage({progress:p}));postMessage({result:r});}catch(err){postMessage({error:String(err)});}};';
+ try{const blob=new Blob([code],{type:'application/javascript'});const url=URL.createObjectURL(blob);worker=new Worker(url);URL.revokeObjectURL(url);worker.onmessage=e=>{if(token!==generation)return;if(e.data.progress){$('confidence').textContent=e.data.progress.phase+'…';return;}if(e.data.error){analysisError();return;}worker.terminate();worker=null;result=e.data.result;showResult(result);};worker.onerror=analysisError;worker.postMessage({state:JSON.parse(JSON.stringify(state)),quality});}
+ catch(e){analysisError();}
+}
+function analysisError(){if(worker){worker.terminate();worker=null;}$('thinking').classList.add('hidden');$('recommend').textContent='ANALYSIS UNAVAILABLE';$('reason').textContent='This browser could not start the strategy worker. Try Safari or your installed Home Screen app. Scorekeeping still works.';$('confidence').textContent='No recommendation is being made.';}
+function showResult(r){$('thinking').classList.add('hidden');$('recommend').textContent=r.action==='BANK'?'BANK NOW':'KEEP ROLLING';$('recommend').classList.toggle('bank',r.action==='BANK');$('advisorylabel').textContent=r.exact?'Proven endgame decision':'Model-based recommendation';$('odds').classList.remove('hidden');$('bankodds').textContent=pct(r.bank);$('rollodds').textContent=r.roll===null?'—':pct(r.roll);$('bankmargin').textContent=r.exact&&!r.samples?'Calculated win share':'±'+(100*(r.bankMargin||0)).toFixed(1)+' pp sampling';$('rollmargin').textContent=r.exact&&!r.samples?'Calculated win share':'±'+(100*(r.rollMargin||0)).toFixed(1)+' pp sampling';if(r.exact){$('reason').textContent=r.action==='BANK'?'Banking guarantees first place. You are the last active player in the final round.':'You are last to act in the final round. Keep rolling until banking puts you strictly ahead.';$('confidence').textContent=r.samples?'Decision is exact. Probability is simulated. Ties count as a split win.':'Exact last-player calculation with fair dice. Ties count as a split win.';}else{const diff=Math.abs(r.roll-r.bank)*100;$('reason').textContent=r.close?'The choices are close within sampling noise. '+r.action+' has the higher estimate; use Think deeper to refine it.':(r.action==='BANK'?'Secure this pot.':'Accept the risk and keep playing.')+' Estimated edge: '+diff.toFixed(1)+' percentage points.';$('confidence').textContent=fmt(r.samples)+' held-out games per choice · '+r.plans+' plans searched. Sampling ± excludes opponent-model error.';}if(r.guarded)$('confidence').textContent+=' Rare simulation limit reached.';$('deeper').classList.toggle('hidden',r.exact&&!r.samples);}
+$('deeper').onclick=()=>{$('thinking').classList.remove('hidden');$('deeper').classList.add('hidden');$('confidence').textContent='Refining with more simulations…';analyze('deep');};
+function renderPlayers(){const count=Math.ceil(state.players.length/4);page=Math.max(0,Math.min(page,count-1));const list=$('playerlist');list.replaceChildren();for(let i=page*4;i<Math.min(page*4+4,state.players.length);i++){const p=state.players[i],row=document.createElement('div');row.className='player';const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent=i===0?'YOU':String(i+1);const details=document.createElement('button');details.className='grow quiet';details.style.cssText='text-align:left;padding:0;min-height:35px;border:0';details.onclick=()=>editPlayer(i);const name=document.createElement('div');name.className='name';name.textContent=p.name;const sub=document.createElement('div');sub.className='status';sub.textContent=(state.ended?(p.active?'Busted':'Banked'+(p.banked?' '+fmt(p.banked):'')):p.active?'Still rolling':'Banked'+(p.banked?' '+fmt(p.banked):''))+' · '+(i===0?'Your seat':p.style==='learn'?'Learning · '+(p.observations||0):p.style);details.append(name,sub);const score=document.createElement('div');score.className='score';score.textContent=fmt(p.score);const b=document.createElement('button');b.className='smallbtn '+(p.active?'gold':'quiet');b.textContent=p.active?'BANK':'✓';b.disabled=state.ended||state.rolls<3||!p.active;b.onclick=()=>bankPlayer(i);row.append(avatar,details,score,b);list.append(row);}$('playerpage').textContent=(page+1)+' / '+count+' · '+state.players.length+' players';$('prevplayers').disabled=page===0;$('nextplayers').disabled=page===count-1;}
+$('prevplayers').onclick=()=>{page--;renderPlayers();};$('nextplayers').onclick=()=>{page++;renderPlayers();};
+function editPlayer(i){const p=state.players[i],body=document.createElement('div');body.style.cssText='display:flex;flex-direction:column;gap:10px';body.append(field('Name','editname',p.name),field('Banked total score','editscore',p.score,'number'));const statuswrap=document.createElement('div'),statuslabel=document.createElement('label'),statusselect=document.createElement('select');statuslabel.htmlFor='editactive';statuslabel.textContent='Current round status';statusselect.id='editactive';for(const [v,t] of [['active','Still rolling'],['banked','Already banked']]){const o=document.createElement('option');o.value=v;o.textContent=t;statusselect.append(o);}statusselect.value=p.active?'active':'banked';statusselect.disabled=state.rolls<3||state.ended;statuswrap.append(statuslabel,statusselect);body.append(statuswrap);if(i>0){const wrap=document.createElement('div'),l=document.createElement('label');l.textContent='Opponent style';l.htmlFor='editstyle';const sel=document.createElement('select');sel.id='editstyle';for(const [v,t]of [['learn','Learn from observed choices'],['cautious','Cautious · banks earlier'],['balanced','Balanced'],['bold','Bold · risks larger pots']]){const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o);}sel.value=p.style;wrap.append(l,sel);body.append(wrap);}modal('Edit player',body,[{text:'Cancel',fn:closeModal},{text:'Save',className:'primary',fn:()=>{const score=+$('editscore').value,name=$('editname').value.trim();if(!Number.isSafeInteger(score)||score<0||!name)return message('Check entries','Use a name and a nonnegative whole-number score.');mutate(()=>{p.name=name.slice(0,40);p.score=score;if(state.rolls>=3&&!state.ended){p.active=$('editactive').value==='active';if(!p.active&&!p.banked)p.banked=0;if(state.players.every(x=>!x.active))endRound('Everyone is marked banked. Round complete.');}if(i>0)p.style=$('editstyle').value;});closeModal();}}]);}
+$('addplayer').onclick=()=>{const body=document.createElement('div');body.append(field('Name / prefix','newname','Player'),field('Number to add','newcount',1,'number'));const text=document.createElement('p');text.style.marginTop='12px';text.textContent='New players start active with zero points. Add your full table before the first roll when possible.';body.append(text);modal('Add player',body,[{text:'Cancel',fn:closeModal},{text:'Add',className:'primary',fn:()=>{const name=$('newname').value.trim(),count=+$('newcount').value;if(!name||!Number.isInteger(count)||count<1||count>1000)return message('Check entries','Enter a name and add between 1 and 1,000 players at a time.');mutate(()=>{for(let k=0;k<count;k++){const p=freshPlayer((count===1?name:name+' '+(state.players.length+1)).slice(0,40));if(state.ended)p.active=false;state.players.push(p);}page=Math.floor((state.players.length-1)/4);});closeModal();}}]);};
+$('rounds').onchange=()=>{const n=+$('rounds').value;if(n<state.round){$('rounds').value=state.rounds;return message('Round count too low','The total must be at least the current round.');}mutate(()=>{state.rounds=n;state.finished=state.ended&&state.round===n;});};$('quality').onchange=()=>mutate(()=>state.quality=$('quality').value);
+$('position').onclick=()=>{const body=document.createElement('div');body.className='formgrid';body.append(field('Current round','stateround',state.round,'number'),field('Rolls completed','staterolls',state.rolls,'number'),field('Current pot','statepot',state.pot,'number'));modal('Set game state',body,[{text:'Cancel',fn:closeModal},{text:'Apply',className:'primary',fn:()=>{const r=+$('stateround').value,k=+$('staterolls').value,p=+$('statepot').value;if(!Number.isInteger(r)||r<1||r>state.rounds||!Number.isInteger(k)||k<0||k>10000||!Number.isSafeInteger(p)||p<0)return message('Check entries','Use valid whole numbers. The round must be within your game length.');mutate(()=>{state.round=r;state.rolls=k;state.pot=p;state.ended=false;state.finished=false;state.players.forEach(p=>{p.active=true;p.banked=0;});state.event='State updated. Set any banked players on Players.';});closeModal();message('Mark banked players','All players are active. On Players, tap a name to enter their correct total score and choose Already banked for anyone out of this round. This status edit adds no points.');}}]);};
+$('newgame').onclick=()=>modal('Start a new game?','Scores and learned opponent choices will reset. Player names and styles are kept. Undo can restore the previous game.',[{text:'Cancel',fn:closeModal},{text:'New game',className:'primary',fn:()=>{mutate(()=>{const players=state.players.map(p=>({...freshPlayer(p.name),style:p.style})),rounds=state.rounds,quality=state.quality;state={...fresh(),players,rounds,quality};});closeModal();showScreen('play');}}]);
+$('exportgame').onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='bank-pilot-game.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);};
+$('importgame').onclick=()=>$('importfile').click();$('importfile').onchange=async()=>{const f=$('importfile').files[0];if(!f)return;try{if(f.size>10000000)throw Error();const s=JSON.parse(await f.text());if(!valid(s))throw Error();mutate(()=>state=s);message('Game restored','Scores, round state and learned opponent choices have been imported.');}catch(e){message('Could not import','Choose a valid Bank Pilot game export.');}$('importfile').value='';};
+const guide=[['Use it at your table','Add everyone on Players. You are always the first seat. Enter both physical dice after each roll, then tap BANK for each person who stops. Ask for the next roll only after everyone has had a chance to bank.','If several people bank together, record all of them before using the next recommendation.'],['What the recommendation means','The engine searches stopping plans, simulates the rest of the game, and compares BANK now against ROLL now. It aims for first place, with a k-way tie worth 1/k of a win.','This is an approximation, not a globally optimal strategy against arbitrary humans.'],['Learning your opponents','Learning starts with a broad mix of cautious and bold players. Each recorded risk-phase roll counts as a continue decision for every active opponent. A BANK records a stop decision.','Choose a known style on Players, or leave Learning enabled. Observed choices improve the model; they do not reveal a person’s strategy perfectly.'],['How much to trust it','Shown ± values measure Monte Carlo sampling error only. Opponent assumptions and the limited stopping-plan search can create larger errors. Think deeper triples samples; it does not prove optimal play.','The last active player’s final-round decision is exact: bank when strictly ahead; otherwise roll until you can be.'],['The rules in your photos','First three rolls: add the dice sum, except seven adds 70. No banking yet. Thereafter: seven busts; doubles double the current pot without adding their sum; other rolls add their sum.','Banking gives you the full pot and leaves it unchanged for others. A round ends after a bust or after everyone banks.'],['Offline on your iPhone','Upload every ZIP file to the same GitHub Pages folder. Open the HTTPS page in Safari while online. Wait for “Offline ready,” then Share → Add to Home Screen. Open that icon once while online too.','Test in Airplane Mode before you need it. iOS can clear website data, so export important games. No external libraries or network calls are used by the engine.']];
+function renderGuide(){const c=$('methodcontent');c.replaceChildren();const h=document.createElement('h3');h.textContent=guide[methodpage][0];const p=document.createElement('p');p.textContent=guide[methodpage][1];const q=document.createElement('p');q.className='callout';q.textContent=guide[methodpage][2];c.append(h,p,q);$('methodpage').textContent=(methodpage+1)+' / '+guide.length;$('prevmethod').disabled=methodpage===0;$('nextmethod').disabled=methodpage===guide.length-1;}
+$('prevmethod').onclick=()=>{methodpage--;renderGuide();};$('nextmethod').onclick=()=>{methodpage++;renderGuide();};$('install').onclick=()=>{methodpage=5;renderGuide();showScreen('method');};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopWork();else if(!state.ended&&state.players[0].active&&state.rolls>=3)render();});
+if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').then(async reg=>{await navigator.serviceWorker.ready;const cache=await caches.open('bank-pilot-v1.0.0');const ready=await cache.match(new URL('./index.html',location.href));$('offline').textContent=ready?'Offline ready':'Preparing offline…';}).catch(()=>$('offline').textContent='Offline cache failed');else $('offline').textContent='Open via HTTPS to install';
+renderGuide();render();save();
+</script>
+</body>
+</html>
