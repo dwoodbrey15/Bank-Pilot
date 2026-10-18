@@ -21,19 +21,19 @@ function bankEngine() {
     return w.map((v,i)=>.9*v+.1*broad[i]);
   }
   function leaders(scores){let first=-Infinity,second=-Infinity,index=-1;for(let i=0;i<scores.length;i++){const v=scores[i];if(v>first){second=first;first=v;index=i;}else if(v>second)second=v;}return{first,second,index};}
+  function potentialLeaders(scores,active,pot){let first=-Infinity,second=-Infinity,index=-1;for(let i=0;i<scores.length;i++){const v=scores[i]+(active[i]?pot:0);if(v>first){second=first;first=v;index=i;}else if(v>second)second=v;}return{first,second,index};}
   function adjusted(base,gap,remaining){return base*clamp(1+gap/(220*Math.sqrt(remaining)),.55,3.5);}
   function fastHazard(pot,gap,remaining,base){if(remaining===1&&pot<gap)return .015;const t=adjusted(base,gap,remaining);return .025+.95/(1+Math.exp(-Math.log(Math.max(1,pot)/t)/.48));}
   function hazard(pot,scores,i,remaining,base){const t=leaders(scores),lead=t.index===i?t.second:t.first;return fastHazard(pot,lead-scores[i],remaining,base);}
   function modelHazard(m,pot,scores,i,remaining,context={},top=leaders(scores)){
+    if(m.family==='noisy')return .13;
+    const sigmoid=t=>.025+.95/(1+Math.exp(-Math.log(Math.max(1,pot)/Math.max(1,t))/.48));
+    if(m.family==='fixed')return sigmoid(m.base);
     const active=context.active||scores.map(()=>true),banked=context.banked||scores.map(()=>0),last=context.lastBank??-1;
     const other=top.index===i?top.second:top.first;
-    const potential=context.potentialTop||leaders(scores.map((v,j)=>v+(active[j]?pot:0)));
+    const potential=context.potentialTop||potentialLeaders(scores,active,pot);
     const gap=(potential.index===i?potential.second:potential.first)-(scores[i]+(active[i]?pot:0));
-    const sigmoid=t=>.025+.95/(1+Math.exp(-Math.log(Math.max(1,pot)/Math.max(1,t))/.48));
-    if(m.family==='noisy')return .13;
-    if(m.family==='fixed')return sigmoid(m.base);
-    let h=fastHazard(pot,gap,remaining,m.base);
-    if(m.family==='chaser')h=sigmoid(m.base*clamp(1+gap/(100*Math.sqrt(remaining)),.25,8));
+    let h=m.family==='chaser'?sigmoid(m.base*clamp(1+gap/(100*Math.sqrt(remaining)),.25,8)):fastHazard(pot,gap,remaining,m.base);
     if(m.family==='reactive'&&last>=0&&last!==i)h=Math.max(h,.8);
     if(m.family==='matcher'||m.family==='strategic'){
       if(scores.length===2){const j=1-i;if(active[j]&&scores[i]>=scores[j])return .005;if(!active[j]&&scores[i]+pot>scores[j])return .995;}
@@ -80,7 +80,7 @@ function bankEngine() {
     if(g.active[0]&&action===0)bankAt(g,0);
     for(;;){
       if(!g.active.some(Boolean)){nextRound(g,w);return;}
-      const top=leaders(g.scores),remaining=g.rounds-g.round+1;g.potentialTop=leaders(g.scores.map((v,j)=>v+(g.active[j]?g.pot:0)));
+      const top=leaders(g.scores),remaining=g.rounds-g.round+1;g.potentialTop=potentialLeaders(g.scores,g.active,g.pot);
       const n=g.active.length,offset=Math.floor(hash(w.seed,g.round,g.step,500)*Math.max(1,n-1));
       let changed=false;
       for(let k=0;k<n-1;k++){
@@ -90,8 +90,8 @@ function bankEngine() {
         if(hash(w.seed,g.round,g.step,i+10)<h){bankAt(g,i);changed=true;break;}
       }
       if(changed){if(g.active[0])return;continue;}
-      const[a,b]=dice(g,w),t=transition(g.pot,3,a,b);g.pot=t.pot;g.step++;g.lastBank=-1;
-      if(t.bust){nextRound(g,w);return;}
+      const[a,b]=dice(g,w),sum=a+b;g.pot=sum===7?0:a===b?g.pot*2:g.pot+sum;g.step++;g.lastBank=-1;
+      if(sum===7){nextRound(g,w);return;}
       if(g.step>=183||!Number.isSafeInteger(g.pot)){g.guarded=true;nextRound(g,w);return;}
       if(g.active[0])return;
     }
@@ -113,7 +113,7 @@ function bankEngine() {
     if(g.scores.length===2){if(g.active[1]&&g.scores[0]>=g.scores[1])return 1;if(!g.active[1]&&g.scores[0]+g.pot>g.scores[1])return 0;}
     const final=g.round===g.rounds;if(final&&!opponents)return g.scores[0]+g.pot>other?0:1;
     if(final&&g.scores[0]+g.pot<=other)return 1;
-    if(p.patient&&opponents&&g.active.slice(1).every(Boolean))return 1;
+    if(p.patient&&opponents===g.active.length-1&&opponents)return 1;
     const current=g.round===g.initialRound,rem=g.rounds-g.round+1;
     let t=current?p.threshold:adjusted(p.future,other-g.scores[0],rem);
     if(current&&p.adaptive)t=adjusted(p.threshold,other-g.scores[0],rem);
@@ -142,8 +142,8 @@ function bankEngine() {
     const work=options.work;const keepGoing=(phase,count,time)=>work?count<(work[phase]||1):clock()<time;
     const policyUntil=started+span*.14,treeUntil=started+span*.56,tuneUntil=started+span*.68;
     const ctx={cache:new Map(),nodes:1,maxNodes:options.maxNodes||24000,guarded:0},post=s.players.map(p=>modelWeights(p)),stress=scenarios.map((_,i)=>s.players.map(p=>modelWeights(p,i))),all=plans(s),records=all.map((p,i)=>({p,i,n:0,b:0,r:0}));
-    let pool=records.slice(),trial=0,searchGames=0,nextProgress=started;
-    const report=phase=>{const now=clock();if(now>=nextProgress){progress({phase,elapsed:now-started,nodes:ctx.nodes,games:searchGames});nextProgress=now+160;}};
+    let pool=records.slice(),trial=0,searchGames=0,evaluatedOutcomes=0,nextProgress=started;
+    const report=phase=>{const now=clock();if(now>=nextProgress){progress({phase,elapsed:now-started,nodes:ctx.nodes,games:searchGames,outcomes:evaluatedOutcomes});nextProgress=now+160;}};
     do{for(let batch=0;batch<12;batch++){const t=trial++,worldseed=(seed+Math.imul(t+1,104729))>>>0;for(const rec of pool){rec.b+=one(s,rec.p,0,worldseed,post,stratum(t,101),ctx);rec.r+=one(s,rec.p,1,worldseed,post,stratum(t,101),ctx);rec.n++;searchGames+=2;}if(work?trial>=work.policy:clock()>=policyUntil)break;}if(pool.length>4){const take=Math.max(1,Math.ceil(pool.length/4)),keep=new Set([...pool.slice().sort((a,b)=>b.b/b.n-a.b/a.n).slice(0,take),...pool.slice().sort((a,b)=>b.r/b.n-a.r/a.n).slice(0,take)]);pool=[...keep];}report('Finding banking plans');}while(keepGoing('policy',trial,policyUntil));
     const candidates=pool.filter(r=>r.n>0),bp=candidates.slice().sort((a,b)=>b.b/b.n-a.b/a.n)[0].p,rp=candidates.slice().sort((a,b)=>b.r/b.n-a.r/a.n)[0].p;
     const roots=[node(),node()],selected=[bp,rp];let treeTrials=0;
@@ -161,6 +161,7 @@ function bankEngine() {
       }
       const delta=v[1]-v[0],group=sensitivity[scenario];group.n++;group.b+=v[0];group.r+=v[1];group.d+=delta;group.d2+=delta*delta;
       if(scenario===0){b+=v[0];r+=v[1];b2+=v[0]*v[0];r2+=v[1]*v[1];d+=delta;d2+=delta*delta;n++;}
+      evaluatedOutcomes+=chance.length;
       report('Checking chance outcomes and opponent assumptions');
     }while(keepGoing('validation',validation,until));
     const fallbackThreshold=clamp(24*s.players.length*Math.sqrt(s.rounds),100,1400);
